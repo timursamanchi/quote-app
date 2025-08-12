@@ -1,0 +1,33 @@
+# generates test load - to test the HPA
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  namespace: quote-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      labels:
+        app: load-generator
+    spec:
+      containers:
+        - name: busybox
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - >
+              while true; do
+                wget -q -O- http://quote-backend:8080/quote;
+                sleep 0.1;
+              done
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
