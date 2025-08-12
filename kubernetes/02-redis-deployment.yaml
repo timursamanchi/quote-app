@@ -1,0 +1,52 @@
+# 02-redis-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-redis
+  namespace: quote-app
+  labels:
+    app: quote-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quote-redis
+  template:
+    metadata:
+      labels:
+        app: quote-redis
+    spec:
+      containers:
+        - name: redis
+          image: timursamanchi/quote-redis:abc
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          imagePullPolicy: Always
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 15
+            failureThreshold: 3
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data    # Redis default data dir
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data

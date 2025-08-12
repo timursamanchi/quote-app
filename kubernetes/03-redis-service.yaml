@@ -1,0 +1,13 @@
+# 03-redis_service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: quote-redis
+  namespace: quote-app
+spec:
+  type: ClusterIP
+  selector:
+    app: quote-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
