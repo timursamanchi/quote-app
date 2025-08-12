@@ -1,4 +1,4 @@
-# 01-redis-pvc.yaml
+# template: redis-pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
