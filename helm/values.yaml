@@ -142,3 +142,9 @@ frontend:
     minReplicas: 1
     maxReplicas: 3
     targetCPUUtilizationPercentage: 50
+
+##########################
+ingress:
+  enabled: true
+  className: nginx         # or your ingress class
+  annotations: {}          # e.g. nginx.ingress.kubernetes.io/rewrite-target: /
