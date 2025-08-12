@@ -1,0 +1,25 @@
+# 09-ingress-object.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: quote-ingress
+  namespace: quote-app
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: quote-frontend
+                port:
+                  number: 80
+          - path: /quote
+            pathType: Prefix
+            backend:
+              service:
+                name: quote-backend
+                port:
+                  number: 8080
