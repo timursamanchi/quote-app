@@ -59,7 +59,7 @@ helm template quote-app . -n quote-app --set pvc.name=redis-data-prod
 
 If that all looks good, ship it:
 
-helm upgrade --install quote-app . -n quote-app --create-namespace --values values.yaml
+helm upgrade --install quote-app . -n quote-app --create-namespace 
 
 
 

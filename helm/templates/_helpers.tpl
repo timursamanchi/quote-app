@@ -21,10 +21,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-#------------- redis-deployment ------------#
+#------------- redis-deployment and service ------------#
 {{- /* Selector labels for the Redis Deployment */ -}}
 {{- define "quote-app.redis.selectorLabels" -}}
 app: {{ .Values.redis.name }}
 {{- end -}}
 
-#------------- redis-service ------------#
+#------------- backend-deployment ------------#
+{{- define "quote-app.backend.selectorLabels" -}}
+app: {{ .Values.backend.name }}
+{{- end -}}
