@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: timursamanchi/quote-frontend:v123
+          image: timursamanchi/quote-frontend:abc
           ports:
             - containerPort: 80
           resources:
