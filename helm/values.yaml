@@ -1,0 +1,12 @@
+# allow simple renaming if you want
+nameOverride: ""
+fullnameOverride: ""
+
+pvc:
+  name: redis-data
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  # leave empty to use the cluster's default StorageClass (omits the field)
+  storageClassName: ""
+  annotations: {}

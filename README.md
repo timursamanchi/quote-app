@@ -37,3 +37,26 @@ kubectl -n quote-app get deploy quote-app-backend -w
 Clean up the loader when done:
 
 kubectl -n quote-app delete pod loadgen --force --grace-period=0
+
+
+Quick sanity flow next:
+
+# 1) Validate with kubectl (no changes to cluster)
+helm template quote-app . -n quote-app --values values.yaml \
+| kubectl apply --dry-run=client -f -
+
+# 2) Dry-run install with Helm debug
+helm install quote-app . -n quote-app --create-namespace \
+  --values values.yaml --dry-run --debug
+
+Optional quick checks:
+
+# Test adding a storage class
+helm template quote-app . -n quote-app --set pvc.storageClassName=standard
+
+# Test renaming the PVC
+helm template quote-app . -n quote-app --set pvc.name=redis-data-prod
+
+If that all looks good, ship it:
+
+helm upgrade --install quote-app . -n quote-app --create-namespace --values values.yaml
