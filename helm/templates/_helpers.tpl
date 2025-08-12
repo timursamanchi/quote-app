@@ -31,3 +31,20 @@ app: {{ .Values.redis.name }}
 {{- define "quote-app.backend.selectorLabels" -}}
 app: {{ .Values.backend.name }}
 {{- end -}}
+
+#------------- backend-service (names + generic selectors) ---------------#
+
+{{- /* Full name for backend resources (defaults to values.backend.name, else <fullname>-backend) */ -}}
+{{- define "quote-app.backend.fullname" -}}
+{{- if .Values.backend.name -}}
+{{- .Values.backend.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-backend" (include "quote-app.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{- /* Generic selector labels used by Services to match Pods */ -}}
+{{- define "quote-app.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "quote-app.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}

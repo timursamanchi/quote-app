@@ -69,3 +69,49 @@ helm uninstall quote-app -n quote-app
 # if the PV sticks around due to Retain policy:
 kubectl get pv | grep redis
 kubectl delete pvc redis-data -n quote-app || true
+
+
+
+smoke-test the release fast. Run these, in order:
+
+1) Helm + objects overview
+
+helm -n quote-app status quote-app
+kubectl -n quote-app get deploy,po,svc,endpoints,ingress,hpa,pvc
+
+2) Rollouts healthy?
+
+kubectl -n quote-app rollout status deploy/quote-backend
+kubectl -n quote-app rollout status deploy/quote-redis
+
+3) Service wired to pods (endpoints not empty)
+
+kubectl -n quote-app get ep quote-backend -o wide
+kubectl -n quote-app get ep quote-redis   -o wide
+
+    If endpoints are <none>, it’s a label selector mismatch.
+
+4) Quick HTTP check to backend
+
+kubectl -n quote-app port-forward svc/quote-backend 8080:8080 >/tmp/pf.log 2>&1 &
+sleep 1
+curl -fsS http://localhost:8080/quote | head -n1
+kill %1
+
+5) Logs for sanity
+
+kubectl -n quote-app logs deploy/quote-backend --tail=100
+kubectl -n quote-app logs deploy/quote-redis   --tail=50
+
+6) PVC bound?
+
+kubectl -n quote-app get pvc
+kubectl -n quote-app describe pvc redis-data
+
+7) Any warnings/errors
+
+kubectl -n quote-app get events --sort-by=.lastTimestamp | tail -n 30
+
+Optional live view:
+
+watch -n 2 'kubectl -n quote-app get po,svc,endpoints'

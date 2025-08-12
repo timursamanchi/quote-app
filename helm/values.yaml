@@ -2,6 +2,7 @@
 nameOverride: ""
 fullnameOverride: ""
 
+##########################
 pvc:
   name: redis-data
   accessModes:
@@ -49,6 +50,7 @@ redis:
   service:
     type: ClusterIP
 
+##########################
 backend:
   name: quote-backend
   replicaCount: 1
@@ -81,3 +83,10 @@ backend:
       timeoutSeconds: 2
       periodSeconds: 15
       failureThreshold: 3
+
+  service:
+    type: ClusterIP
+    port: 8080
+    # targetPort defaults to port if not set
+    # targetPort: 8080
+    annotations: {}
