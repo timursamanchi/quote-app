@@ -48,3 +48,19 @@ app: {{ .Values.backend.name }}
 app.kubernetes.io/name: {{ include "quote-app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
+
+#------------- frontend-service (names + generic selectors) ---------------#
+
+{{- /* Frontend resource name */ -}}
+{{- define "quote-app.frontend.fullname" -}}
+{{- if .Values.frontend.name -}}
+{{- .Values.frontend.name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-frontend" (include "quote-app.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{- /* Selector labels for frontend */ -}}
+{{- define "quote-app.frontend.selectorLabels" -}}
+app: {{ .Values.frontend.name }}
+{{- end -}}

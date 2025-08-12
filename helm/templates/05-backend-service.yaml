@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "quote-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: backend
+    app: {{ .Values.backend.name }} 
   {{- with .Values.backend.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
