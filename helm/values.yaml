@@ -10,3 +10,41 @@ pvc:
   # leave empty to use the cluster's default StorageClass (omits the field)
   storageClassName: ""
   annotations: {}
+
+##########################
+redis:
+  name: quote-redis
+  replicaCount: 1
+
+  image:
+    repository: timursamanchi/quote-redis
+    tag: abc
+    pullPolicy: Always
+
+  ports:
+    redis: 6379
+
+  volumeMountPath: /data
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  probes:
+    readiness:
+      initialDelaySeconds: 5
+      timeoutSeconds: 2
+      periodSeconds: 10
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 10
+      timeoutSeconds: 2
+      periodSeconds: 15
+      failureThreshold: 3
+
+  service:
+    type: ClusterIP

@@ -60,3 +60,12 @@ helm template quote-app . -n quote-app --set pvc.name=redis-data-prod
 If that all looks good, ship it:
 
 helm upgrade --install quote-app . -n quote-app --create-namespace --values values.yaml
+
+
+
+Clean up (if you want to re-run from scratch)
+
+helm uninstall quote-app -n quote-app
+# if the PV sticks around due to Retain policy:
+kubectl get pv | grep redis
+kubectl delete pvc redis-data -n quote-app || true

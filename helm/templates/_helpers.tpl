@@ -22,3 +22,9 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 #------------- redis-deployment ------------#
+{{- /* Selector labels for the Redis Deployment */ -}}
+{{- define "quote-app.redis.selectorLabels" -}}
+app: {{ .Values.redis.name }}
+{{- end -}}
+
+#------------- redis-service ------------#
