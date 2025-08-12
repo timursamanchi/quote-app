@@ -19,3 +19,21 @@ kubectl -n kube-system get deploy metrics-server
 # 4) Test metrics
 kubectl top nodes
 kubectl top pods -A
+
+
+
+If you want to see it actually scale, throw some load:
+
+# quick n’ dirty load in-cluster
+kubectl -n quote-app run loadgen --image=busybox --restart=Never -- sh -c \
+  'while true; do wget -q -O- http://quote-app-backend:8080 >/dev/null; done'
+
+Watch it:
+
+kubectl -n quote-app get hpa -w
+kubectl -n quote-app top pods
+kubectl -n quote-app get deploy quote-app-backend -w
+
+Clean up the loader when done:
+
+kubectl -n quote-app delete pod loadgen --force --grace-period=0
