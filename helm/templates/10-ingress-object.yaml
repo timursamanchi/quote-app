@@ -1,0 +1,33 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "quote-app.fullname" . }}-ingress
+  labels:
+    {{- include "quote-app.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "quote-app.frontend.fullname" . }}
+                port:
+                  number: {{ .Values.frontend.service.port }}
+          - path: /quote
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "quote-app.backend.fullname" . }}
+                port:
+                  number: {{ .Values.backend.service.port }}
+{{- end }}

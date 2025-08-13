@@ -1,0 +1,150 @@
+# allow simple renaming if you want
+nameOverride: ""
+fullnameOverride: ""
+
+##########################
+pvc:
+  name: redis-data
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  # leave empty to use the cluster's default StorageClass (omits the field)
+  storageClassName: ""
+  annotations: {}
+
+##########################
+redis:
+  name: quote-redis
+  replicaCount: 1
+
+  image:
+    repository: timursamanchi/quote-redis
+    tag: abc
+    pullPolicy: Always
+
+  ports:
+    redis: 6379
+
+  volumeMountPath: /data
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  probes:
+    readiness:
+      initialDelaySeconds: 5
+      timeoutSeconds: 2
+      periodSeconds: 10
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 10
+      timeoutSeconds: 2
+      periodSeconds: 15
+      failureThreshold: 3
+
+  service:
+    type: ClusterIP
+
+##########################
+backend:
+  name: quote-backend
+  replicaCount: 1
+
+  image:
+    repository: timursamanchi/quote-backend
+    tag: abc
+    pullPolicy: Always
+
+  ports:
+    http: 8080
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  probes:
+    path: /quote
+    readiness:
+      initialDelaySeconds: 5
+      timeoutSeconds: 2
+      periodSeconds: 10
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 10
+      timeoutSeconds: 2
+      periodSeconds: 15
+      failureThreshold: 3
+
+  service:
+    type: ClusterIP
+    port: 8080
+    # targetPort defaults to port if not set
+    # targetPort: 8080
+    annotations: {}
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 50
+
+##########################
+frontend:
+  name: quote-frontend
+  replicaCount: 1
+
+  image:
+    repository: timursamanchi/quote-frontend
+    tag: abc
+    pullPolicy: Always
+
+  ports:
+    http: 80
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  probes:
+    path: /
+    readiness:
+      initialDelaySeconds: 5
+      timeoutSeconds: 2
+      periodSeconds: 10
+      failureThreshold: 3
+    liveness:
+      initialDelaySeconds: 10
+      timeoutSeconds: 2
+      periodSeconds: 15
+      failureThreshold: 3
+
+  service:
+    type: ClusterIP
+    port: 80
+    # targetPort: 80   # (optional; defaults to frontend.ports.http)
+    annotations: {}
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 50
+
+##########################
+ingress:
+  enabled: true
+  className: nginx         # or your ingress class
+  annotations: {}          # e.g. nginx.ingress.kubernetes.io/rewrite-target: /

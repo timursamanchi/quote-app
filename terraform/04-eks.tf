@@ -20,12 +20,11 @@ module "eks" {
   create_iam_role                = true
   create_cluster_security_group  = true
   cluster_endpoint_public_access = true  
+
   create_cloudwatch_log_group            = true
   cloudwatch_log_group_retention_in_days = 7
 
-
   manage_aws_auth_configmap = true
-
   aws_auth_users = [
     for entry in var.eks_admin_access_entries : {
       userarn  = entry.principal_arn

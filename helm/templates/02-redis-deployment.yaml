@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.redis.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "quote-app.labels" . | nindent 4 }}
+    {{- include "quote-app.redis.selectorLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.redis.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "quote-app.redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "quote-app.labels" . | nindent 8 }}
+        {{- include "quote-app.redis.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: redis
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          imagePullPolicy: {{ .Values.redis.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.redis.ports.redis }}
+          resources:
+            {{- toYaml .Values.redis.resources | nindent 12 }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.redis.ports.redis }}
+            initialDelaySeconds: {{ .Values.redis.probes.readiness.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.redis.probes.readiness.timeoutSeconds }}
+            periodSeconds: {{ .Values.redis.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.redis.probes.readiness.failureThreshold }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.redis.ports.redis }}
+            initialDelaySeconds: {{ .Values.redis.probes.liveness.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.redis.probes.liveness.timeoutSeconds }}
+            periodSeconds: {{ .Values.redis.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.redis.probes.liveness.failureThreshold }}
+          volumeMounts:
+            - name: redis-data
+              mountPath: {{ .Values.redis.volumeMountPath }}
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.pvc.name }}

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "quote-app.frontend.fullname" . }}
+  labels:
+    {{- include "quote-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+    app: {{ .Values.frontend.name }} 
+  {{- with .Values.frontend.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.frontend.service.type }}
+  selector:
+    {{- include "quote-app.frontend.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.frontend.service.port }}
+      # defaults to container port if not set
+      targetPort: {{ .Values.frontend.service.targetPort | default .Values.frontend.ports.http }}

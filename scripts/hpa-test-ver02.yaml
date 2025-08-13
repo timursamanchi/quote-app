@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgen
+  namespace: quote-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels: {app: loadgen}
+  template:
+    metadata:
+      labels: {app: loadgen}
+    spec:
+      containers:
+        - name: busybox
+          image: busybox
+          command: ["/bin/sh","-lc"]
+          args:
+            - while true; do wget -q -O- http://quote-backend:8080/quote > /dev/null; done
+          resources:
+            requests: {cpu: "5m", memory: "16Mi"}
+            limits:
+              cpu: "50m"
+              memory: "32Mi"
+
+

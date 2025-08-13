@@ -1,0 +1,7 @@
+Watch it scale:
+
+watch -n 2 'kubectl -n quote-app get hpa,deploy'
+
+Clean up when done:
+
+kubectl -n quote-app delete deploy loadgen

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "quote-app.labels" . | nindent 4 }}
+    {{- include "quote-app.backend.selectorLabels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "quote-app.backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "quote-app.labels" . | nindent 8 }}
+        {{- include "quote-app.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.ports.http }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.backend.probes.path }}
+              port: {{ .Values.backend.ports.http }}
+            initialDelaySeconds: {{ .Values.backend.probes.readiness.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.backend.probes.readiness.timeoutSeconds }}
+            periodSeconds: {{ .Values.backend.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.backend.probes.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.backend.probes.path }}
+              port: {{ .Values.backend.ports.http }}
+            initialDelaySeconds: {{ .Values.backend.probes.liveness.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.backend.probes.liveness.timeoutSeconds }}
+            periodSeconds: {{ .Values.backend.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.backend.probes.liveness.failureThreshold }}
